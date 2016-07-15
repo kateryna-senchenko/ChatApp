@@ -4,29 +4,29 @@ var EventBus = function () {
 
     var _post = function (eventType, evt) {
 
-        if (_subscribers.length === 0) {
+        var _specificSubscribers = _subscribers[eventType];
+
+        if (typeof _specificSubscribers === 'undefined') {
             return;
-        } else {
-
-            var _specificSubscribers = _subscribers[eventType];
-
-            for (var i = 0; i < _specificSubscribers.length; i++) {
-
-                var _currentCallback = function (index) {
-
-
-                    setTimeout(function () {
-                        var _currentCbk = _specificSubscribers[index];
-                        _currentCbk(evt);
-
-                    }, 10);
-
-                };
-
-                _currentCallback(i);
-            }
         }
-    }
+
+        for (var i = 0; i < _specificSubscribers.length; i++) {
+
+            var _currentCallback = function (index) {
+
+
+                setTimeout(function () {
+                    var _currentCbk = _specificSubscribers[index];
+                    _currentCbk(evt);
+
+                }, 10);
+
+            };
+
+            _currentCallback(i);
+        }
+
+    };
 
     var _subscribe = function (eventType, callback) {
 
@@ -40,7 +40,7 @@ var EventBus = function () {
         } else {
             return;
         }
-    }
+    };
     return {
         "post": _post,
         "subscribe": _subscribe
