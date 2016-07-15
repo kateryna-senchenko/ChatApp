@@ -1,0 +1,14 @@
+{
+  "name": "chat-room",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chat-room.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+        "amdefine": ">=0.1.0"
+    },
+  "author": "",
+  "license": "ISC"
+}
