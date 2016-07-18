@@ -1,5 +1,11 @@
 var UserService = function (eventBus) {
 
+    var _events = {};
+
+    var _setEvents = function(events){
+        _events = events;
+    };
+
     var UserStorage = function(){
 
         var _storage = {};
@@ -21,6 +27,8 @@ var UserService = function (eventBus) {
                 "getAllUsers": _getAllKeys };
     };
 
+
+
     var userStorage = new UserStorage();
 
     var _failRegistrationEvent = {
@@ -36,12 +44,12 @@ var UserService = function (eventBus) {
         if (typeof userStorage.getPassword(AddUserEvent.newNickname) !== "undefined") {
 
             _failRegistrationEvent.message = "User with specified nickname is already exist";
-            eventBus.post("failRegistration", _failRegistrationEvent);
+            eventBus.post(_events.FAIL_REGISTRATION, _failRegistrationEvent);
 
         } else if (AddUserEvent.newUserPassword !== AddUserEvent.newUserConfirmationPassword) {
 
             _failRegistrationEvent.message = "Passwords do not match";
-            eventBus.post("failRegistration", _failRegistrationEvent);
+            eventBus.post(_events.FAIL_REGISTRATION, _failRegistrationEvent);
 
         } else {
 
@@ -52,13 +60,14 @@ var UserService = function (eventBus) {
 
             _successfulRegistrationEvent.message = "User " + AddUserEvent.newNickname + " is successfully registered"
 
-            eventBus.post("successfulRegistration", _successfulRegistrationEvent);
-            eventBus.post("displayUsers", userStorage.getAllUsers());
+            eventBus.post(_events.SUCCESSFUL_REGISTRATION, _successfulRegistrationEvent);
+            eventBus.post(_events.DISPLAY_USERS, userStorage.getAllUsers());
         }
     };
 
 
     return {"addUser": _registerUser,
+            "setEvents": _setEvents,
             "UserStorage": userStorage};
 };
 
