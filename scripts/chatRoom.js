@@ -1,113 +1,93 @@
-var ChatRoom = function(chatRoomDivId, eventBus, userRegistrationEvents, userService) {
+var ChatRoom = function (chatRoomDivId, eventBus, userRegistrationEvents, userService) {
 
 
-    var root = document.getElementById(chatRoomDivId);
     var registrationBoxId = chatRoomDivId + "_registration";
     var userListBoxId = chatRoomDivId + "_userlist";
 
-    root.innerHTML = '<div id="' + registrationBoxId + '"></div>'+
-    '<div id="' + userListBoxId + '"></div>';
+    $("#" + chatRoomDivId).append($('<div/>').attr("id", registrationBoxId))
+                          .append($('<div/>').attr("id", userListBoxId));
+
 
     var RegistrationComponent = function (registrationBoxId, eventBus) {
 
         var _initialize = function () {
 
-            var registrationRoot = document.getElementById(registrationBoxId);
+            var contentId = registrationBoxId + "_content";
+            $("#" + registrationBoxId).html($('<div/>').attr("id", contentId));
 
             var buttonId = registrationBoxId + "_button";
-
             var nicknameInputId = registrationBoxId + "_nickname";
-
             var passwordInputId = registrationBoxId + "_password";
-
             var confirmPasswordInputId = registrationBoxId + "_confirm_password";
+            var registrationMessageId = registrationBoxId + "_message";
 
-            registrationRoot.innerHTML =  '<div id="' + registrationBoxId + "_content" + '" class="registration-box">'+
-                'Nickname:<br>' +
-                '<input type="text" name="nickname" id="' + nicknameInputId + '">' +
-                '<br>' +
-                'Password:<br>' +
-                '<input type="password" name="password" id="' + passwordInputId + '">' +
-                '<br>' +
-                'Confirm password:<br>' +
-                '<input type="password" name="confirmPassword" id="' + confirmPasswordInputId + '">' +
-                '<br>' +
-                '<div id = ' + registrationBoxId + "_message" + '></div><br>' +
-                '<button id="' + buttonId + '">Register</button>'+
-                '</div>';
+            $("#" + contentId).append($('<label/>').text("Nickname")).append($('<br/>'))
+                              .append($('<input/>').attr("id", nicknameInputId).attr("type", "text"))
+                              .append($('<br/>'))
+                              .append($('<label/>').text("Password")).append($('<br/>'))
+                              .append($('<input/>').attr("id", passwordInputId).attr("type", "password"))
+                              .append($('<br/>'))
+                              .append($('<label/>').text("Confirm Password")).append('<br/>')
+                              .append($('<input/>').attr("id", confirmPasswordInputId).attr("type", "password"))
+                              .append($('<br/>'))
+                              .append($('<div/>').attr("id", registrationMessageId)).append($('<br/>'))
+                              .append($('<button/>').attr("id", buttonId).text('Register'));
 
 
-            /*$("#buttonId").click(function(){
-                var nicknameInput = document.getElementById(nicknameInputId);
-                var passwordInput = document.getElementById(passwordInputId);
-                var confirmPasswordInput = document.getElementById(confirmPasswordInputId);
+            $("#"+buttonId).click(function () {
 
                 var newUserData = {
-                    newNickname: nicknameInput.value,
-                    newUserPassword: passwordInput.value,
-                    newUserConfirmationPassword: confirmPasswordInput.value
-                };
-
-                eventBus.post(_events.USER_IS_ADDED, newUserData);
-                console.log("User's " + newUserData.newNickname + " data posted");
-            });*/
-
-            var button = document.getElementById(buttonId);
-
-            button.onclick = function () {
-
-                var nicknameInput = document.getElementById(nicknameInputId);
-                var passwordInput = document.getElementById(passwordInputId);
-                var confirmPasswordInput = document.getElementById(confirmPasswordInputId);
-
-                var newUserData = {
-                    newNickname: nicknameInput.value,
-                    newUserPassword: passwordInput.value,
-                    newUserConfirmationPassword: confirmPasswordInput.value
+                    newNickname: $("#" + nicknameInputId).val(),
+                    newUserPassword: $("#" + passwordInputId).val(),
+                    newUserConfirmationPassword: $("#" + confirmPasswordInputId).val()
                 };
 
                 eventBus.post(userRegistrationEvents.events.USER_IS_ADDED, newUserData);
                 console.log("User's " + newUserData.newNickname + " data posted");
-            }
-
+            });
         };
 
         var _displayRegistrationError = function (failRegistrationEvent) {
+
             var errorElementRootId = registrationBoxId + "_message";
-            var errorElement = document.getElementById(errorElementRootId);
-            errorElement.innerHTML = '<p style="color:red">' + failRegistrationEvent.message + '</p>'
+            $("#" + errorElementRootId).html($('<p/>').attr("style", "color:red")
+                                                      .text(failRegistrationEvent.message));
         };
 
         var _displayRegistrationMessage = function (successfulRegistrationEvent) {
+
             var messageElementRootId = registrationBoxId + "_message";
-            var messageElement = document.getElementById(messageElementRootId);
-            messageElement.innerHTML = '<p style="color:green">' + successfulRegistrationEvent.message + '</p>'
+            $("#" + messageElementRootId).html($('<p/>').attr("style", "color:green")
+                .text(successfulRegistrationEvent.message));
+
         };
 
 
-        return {"init": _initialize,
+        return {
+            "init": _initialize,
             "showRegistrationError": _displayRegistrationError,
-            "showSuccessfulRegistrationMessage": _displayRegistrationMessage};
+            "showSuccessfulRegistrationMessage": _displayRegistrationMessage
+        };
     };
 
     var UserListComponent = function (userListBoxId) {
 
         var _initialize = function (showUserListEvent) {
 
-            var userListRoot = document.getElementById(userListBoxId);
-            userListRoot.innerHTML = '<div id="' + userListBoxId + "_content" + '" class="userlist-box">'+
-                '<h3>Registered users</h3>'+
-                '<p id="'+userListBoxId+"_users"+'"></p>'+
-                '</div>';
+            var contentId = userListBoxId + "_content";
+            $("#" + userListBoxId).html($('<div/>').attr("id", contentId));
 
-            if(typeof  showUserListEvent !== 'undefined') {
+            $("#" + contentId).append($('<h3/>').text("Registered users"));
+
+
+            if (typeof  showUserListEvent !== 'undefined') {
+
                 var userList = showUserListEvent;
-                var usersRoot = document.getElementById(userListBoxId+"_users");
-                var users = "<br>";
+
                 for (var i = 0; i < userList.length; i++) {
-                    users += userList[i] + '<br>';
+                    $("#" + contentId).append($('<li/>').text(userList[i]));
+
                 }
-                usersRoot.innerHTML = '<p>'+users+'<br></p>';
             }
         };
 

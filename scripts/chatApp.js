@@ -1,10 +1,3 @@
-/*requirejs.config({
-    baseUrl: 'node_modules/jquery/dist',
-    paths: {
-        jquery: 'jquery'
-    }
-});*/
-
 define(function (require) {
 
     var EventBus = require('./eventbus');
