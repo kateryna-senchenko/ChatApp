@@ -1,20 +1,14 @@
-var UserService = function (eventBus) {
+var UserService = function (eventBus, userRegistrationEvents) {
 
-    var _events = {};
-
-    var _setEvents = function(events){
-        _events = events;
-    };
-
-    var UserStorage = function(){
+    var UserStorage = function () {
 
         var _storage = {};
 
-        var _getValueByKey = function(key){
-           return _storage[key];
+        var _getValueByKey = function (key) {
+            return _storage[key];
         };
 
-        var _setValue = function(key, value){
+        var _setValue = function (key, value) {
             _storage[key] = value;
         };
 
@@ -22,53 +16,52 @@ var UserService = function (eventBus) {
             return Object.keys(_storage);
         };
 
-        return {"getPassword": _getValueByKey,
-                "addUser": _setValue,
-                "getAllUsers": _getAllKeys };
+        return {
+            "getPassword": _getValueByKey,
+            "addUser": _setValue,
+            "getAllUsers": _getAllKeys
+        };
     };
-
 
 
     var userStorage = new UserStorage();
 
-    var _failRegistrationEvent = {
-        "message": ""
-    };
 
-    var _successfulRegistrationEvent = {
-        "message": ""
+    var RegistrationEvent = function(message){
+        this.message = message;
+        return this.message;
     };
 
     var _registerUser = function (AddUserEvent) {
 
         if (typeof userStorage.getPassword(AddUserEvent.newNickname) !== "undefined") {
 
-            _failRegistrationEvent.message = "User with specified nickname is already exist";
-            eventBus.post(_events.FAIL_REGISTRATION, _failRegistrationEvent);
+            var _userExistMessage = "User with specified nickname is already exist";
+            eventBus.post(userRegistrationEvents.events.REGISTRATION_FAILED, new RegistrationEvent(_userExistMessage));
 
         } else if (AddUserEvent.newUserPassword !== AddUserEvent.newUserConfirmationPassword) {
 
-            _failRegistrationEvent.message = "Passwords do not match";
-            eventBus.post(_events.FAIL_REGISTRATION, _failRegistrationEvent);
+            var _passwordsDoNOtMatchMessage = "Passwords do not match";
+            eventBus.post(userRegistrationEvents.events.REGISTRATION_FAILED, new RegistrationEvent(_passwordsDoNOtMatchMessage));
 
         } else {
 
             userStorage.addUser(AddUserEvent.newNickname, AddUserEvent.newUserPassword);
 
-            console.log("Registered user " + AddUserEvent.newNickname + " with password "
-                + userStorage.getPassword(AddUserEvent.newNickname));
+            console.log("Registered user " + AddUserEvent.newNickname);
 
-            _successfulRegistrationEvent.message = "User " + AddUserEvent.newNickname + " is successfully registered"
+            var _userAddedMessage = "User " + AddUserEvent.newNickname + " is successfully registered";
 
-            eventBus.post(_events.SUCCESSFUL_REGISTRATION, _successfulRegistrationEvent);
-            eventBus.post(_events.DISPLAY_USERS, userStorage.getAllUsers());
+            eventBus.post(userRegistrationEvents.events.REGISTRATION_IS_SUCCESSFUL, new RegistrationEvent(_userAddedMessage));
+            eventBus.post(userRegistrationEvents.events.USERS_UPDATED, userStorage.getAllUsers());
         }
     };
 
 
-    return {"addUser": _registerUser,
-            "setEvents": _setEvents,
-            "UserStorage": userStorage};
+    return {
+        "addUser": _registerUser,
+        "UserStorage": userStorage
+    };
 };
 
 if (typeof define !== 'function') {

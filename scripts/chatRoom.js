@@ -1,13 +1,5 @@
-var ChatRoom = function(chatRoomDivId, eventBus, userService) {
+var ChatRoom = function(chatRoomDivId, eventBus, userRegistrationEvents, userService) {
 
-    var _events = {
-        ADD_USER : "addUser",
-        FAIL_REGISTRATION: "failRegistration",
-        SUCCESSFUL_REGISTRATION: "successfulRegistration",
-        DISPLAY_USERS: "displayUsers"
-    };
-
-    userService.setEvents(_events);
 
     var root = document.getElementById(chatRoomDivId);
     var registrationBoxId = chatRoomDivId + "_registration";
@@ -45,6 +37,21 @@ var ChatRoom = function(chatRoomDivId, eventBus, userService) {
                 '</div>';
 
 
+            /*$("#buttonId").click(function(){
+                var nicknameInput = document.getElementById(nicknameInputId);
+                var passwordInput = document.getElementById(passwordInputId);
+                var confirmPasswordInput = document.getElementById(confirmPasswordInputId);
+
+                var newUserData = {
+                    newNickname: nicknameInput.value,
+                    newUserPassword: passwordInput.value,
+                    newUserConfirmationPassword: confirmPasswordInput.value
+                };
+
+                eventBus.post(_events.USER_IS_ADDED, newUserData);
+                console.log("User's " + newUserData.newNickname + " data posted");
+            });*/
+
             var button = document.getElementById(buttonId);
 
             button.onclick = function () {
@@ -59,7 +66,7 @@ var ChatRoom = function(chatRoomDivId, eventBus, userService) {
                     newUserConfirmationPassword: confirmPasswordInput.value
                 };
 
-                eventBus.post(_events.ADD_USER, newUserData);
+                eventBus.post(userRegistrationEvents.events.USER_IS_ADDED, newUserData);
                 console.log("User's " + newUserData.newNickname + " data posted");
             }
 
@@ -79,8 +86,8 @@ var ChatRoom = function(chatRoomDivId, eventBus, userService) {
 
 
         return {"init": _initialize,
-            "showError": _displayRegistrationError,
-            "showMessage": _displayRegistrationMessage};
+            "showRegistrationError": _displayRegistrationError,
+            "showSuccessfulRegistrationMessage": _displayRegistrationMessage};
     };
 
     var UserListComponent = function (userListBoxId) {
@@ -113,10 +120,10 @@ var ChatRoom = function(chatRoomDivId, eventBus, userService) {
 
     registrationComponent.init();
 
-    eventBus.subscribe(_events.ADD_USER, userService.addUser);
-    eventBus.subscribe(_events.FAIL_REGISTRATION, registrationComponent.showError);
-    eventBus.subscribe(_events.SUCCESSFUL_REGISTRATION, registrationComponent.showMessage);
-    eventBus.subscribe(_events.DISPLAY_USERS, userListComponent.init);
+    eventBus.subscribe(userRegistrationEvents.events.USER_IS_ADDED, userService.addUser);
+    eventBus.subscribe(userRegistrationEvents.events.REGISTRATION_FAILED, registrationComponent.showRegistrationError);
+    eventBus.subscribe(userRegistrationEvents.events.REGISTRATION_IS_SUCCESSFUL, registrationComponent.showSuccessfulRegistrationMessage);
+    eventBus.subscribe(userRegistrationEvents.events.USERS_UPDATED, userListComponent.init);
 
 };
 
