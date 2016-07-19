@@ -1,4 +1,4 @@
-var UserService = function (eventBus, userRegistrationEvents, storage) {
+var UserService = function (eventbus, events, storage) {
 
     var _collectionName = "users";
 
@@ -22,12 +22,12 @@ var UserService = function (eventBus, userRegistrationEvents, storage) {
         if (typeof storage.findByPropertyValue(_collectionName, "nickname", userData.newNickname) !== "undefined") {
 
             var _userExistMessage = "User with specified nickname is already exist";
-            eventBus.post(userRegistrationEvents.REGISTRATION_FAILED, new RegistrationEvent(_userExistMessage));
+            eventbus.post(events.REGISTRATION_FAILED, new RegistrationEvent(_userExistMessage));
 
         } else if (userData.newUserPassword !== userData.newUserConfirmationPassword) {
 
             var _passwordsDoNOtMatchMessage = "Passwords do not match";
-            eventBus.post(userRegistrationEvents.REGISTRATION_FAILED, new RegistrationEvent(_passwordsDoNOtMatchMessage));
+            eventbus.post(events.REGISTRATION_FAILED, new RegistrationEvent(_passwordsDoNOtMatchMessage));
 
         } else {
 
@@ -39,8 +39,8 @@ var UserService = function (eventBus, userRegistrationEvents, storage) {
 
             var _userAddedMessage = "User " + userData.newNickname + " is successfully registered";
 
-            eventBus.post(userRegistrationEvents.REGISTRATION_IS_SUCCESSFUL, new RegistrationEvent(_userAddedMessage));
-            eventBus.post(userRegistrationEvents.USERS_UPDATED, storage.getAll(_collectionName));
+            eventbus.post(events.REGISTRATION_IS_SUCCESSFUL, new RegistrationEvent(_userAddedMessage));
+            eventbus.post(events.USERS_UPDATED, storage.getAll(_collectionName));
         }
     };
 

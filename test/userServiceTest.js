@@ -4,7 +4,7 @@ var Storage = require('../scripts/storage');
 var unitjs = require('unit.js');
 
 var eb = EventBus();
-var events = require('../scripts/userRegistrationEvents');
+var events = require('../scripts/chatEvents');
 var storage = Storage();
 var userService = UserService(eb, events, storage);
 
