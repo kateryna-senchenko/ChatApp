@@ -1,66 +1,52 @@
-var UserService = function (eventBus, userRegistrationEvents) {
+var UserService = function (eventBus, userRegistrationEvents, storage) {
 
-    var UserStorage = function () {
+    var _collectionName = "users";
 
-        var _storage = {};
+    var User = function (nickname, password) {
 
-        var _getValueByKey = function (key) {
-            return _storage[key];
-        };
-
-        var _setValue = function (key, value) {
-            _storage[key] = value;
-        };
-
-        var _getAllKeys = function () {
-            return Object.keys(_storage);
-        };
-
-        return {
-            "getPassword": _getValueByKey,
-            "addUser": _setValue,
-            "getAllUsers": _getAllKeys
-        };
+        return{
+            "nickname": nickname,
+            "password": password
+        }
     };
 
 
-    var userStorage = new UserStorage();
-
-
-    var RegistrationEvent = function(message){
+    var RegistrationEvent = function (message) {
         this.message = message;
         return this.message;
     };
 
-    var _registerUser = function (AddUserEvent) {
 
-        if (typeof userStorage.getPassword(AddUserEvent.newNickname) !== "undefined") {
+    var _registerUser = function (userData) {
+
+        if (typeof storage.findByPropertyValue(_collectionName, "nickname", userData.newNickname) !== "undefined") {
 
             var _userExistMessage = "User with specified nickname is already exist";
-            eventBus.post(userRegistrationEvents.events.REGISTRATION_FAILED, new RegistrationEvent(_userExistMessage));
+            eventBus.post(userRegistrationEvents.REGISTRATION_FAILED, new RegistrationEvent(_userExistMessage));
 
-        } else if (AddUserEvent.newUserPassword !== AddUserEvent.newUserConfirmationPassword) {
+        } else if (userData.newUserPassword !== userData.newUserConfirmationPassword) {
 
             var _passwordsDoNOtMatchMessage = "Passwords do not match";
-            eventBus.post(userRegistrationEvents.events.REGISTRATION_FAILED, new RegistrationEvent(_passwordsDoNOtMatchMessage));
+            eventBus.post(userRegistrationEvents.REGISTRATION_FAILED, new RegistrationEvent(_passwordsDoNOtMatchMessage));
 
         } else {
 
-            userStorage.addUser(AddUserEvent.newNickname, AddUserEvent.newUserPassword);
+            var newUser = new User(userData.newNickname, userData.newUserPassword);
 
-            console.log("Registered user " + AddUserEvent.newNickname);
+            storage.add(_collectionName, newUser);
 
-            var _userAddedMessage = "User " + AddUserEvent.newNickname + " is successfully registered";
+            console.log("Registered user " + userData.newNickname);
 
-            eventBus.post(userRegistrationEvents.events.REGISTRATION_IS_SUCCESSFUL, new RegistrationEvent(_userAddedMessage));
-            eventBus.post(userRegistrationEvents.events.USERS_UPDATED, userStorage.getAllUsers());
+            var _userAddedMessage = "User " + userData.newNickname + " is successfully registered";
+
+            eventBus.post(userRegistrationEvents.REGISTRATION_IS_SUCCESSFUL, new RegistrationEvent(_userAddedMessage));
+            eventBus.post(userRegistrationEvents.USERS_UPDATED, storage.getAll(_collectionName));
         }
     };
 
 
     return {
-        "addUser": _registerUser,
-        "UserStorage": userStorage
+        "addUser": _registerUser
     };
 };
 

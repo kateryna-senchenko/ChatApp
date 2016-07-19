@@ -42,7 +42,7 @@ var ChatRoom = function (chatRoomDivId, eventBus, userRegistrationEvents, userSe
                     newUserConfirmationPassword: $("#" + confirmPasswordInputId).val()
                 };
 
-                eventBus.post(userRegistrationEvents.events.USER_IS_ADDED, newUserData);
+                eventBus.post(userRegistrationEvents.USER_IS_ADDED, newUserData);
                 console.log("User's " + newUserData.newNickname + " data posted");
             });
         };
@@ -85,7 +85,7 @@ var ChatRoom = function (chatRoomDivId, eventBus, userRegistrationEvents, userSe
                 var userList = showUserListEvent;
 
                 for (var i = 0; i < userList.length; i++) {
-                    $("#" + contentId).append($('<li/>').text(userList[i]));
+                    $("#" + contentId).append($('<li/>').text(userList[i].nickname));
 
                 }
             }
@@ -100,10 +100,10 @@ var ChatRoom = function (chatRoomDivId, eventBus, userRegistrationEvents, userSe
 
     registrationComponent.init();
 
-    eventBus.subscribe(userRegistrationEvents.events.USER_IS_ADDED, userService.addUser);
-    eventBus.subscribe(userRegistrationEvents.events.REGISTRATION_FAILED, registrationComponent.showRegistrationError);
-    eventBus.subscribe(userRegistrationEvents.events.REGISTRATION_IS_SUCCESSFUL, registrationComponent.showSuccessfulRegistrationMessage);
-    eventBus.subscribe(userRegistrationEvents.events.USERS_UPDATED, userListComponent.init);
+    eventBus.subscribe(userRegistrationEvents.USER_IS_ADDED, userService.addUser);
+    eventBus.subscribe(userRegistrationEvents.REGISTRATION_FAILED, registrationComponent.showRegistrationError);
+    eventBus.subscribe(userRegistrationEvents.REGISTRATION_IS_SUCCESSFUL, registrationComponent.showSuccessfulRegistrationMessage);
+    eventBus.subscribe(userRegistrationEvents.USERS_UPDATED, userListComponent.init);
 
 };
 
