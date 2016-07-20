@@ -2,10 +2,15 @@ var ChatService = function (eventbus, events, storage) {
 
     var _collectionName = "chats";
 
+
     var Chat = function (name, owner) {
 
-        var _members = [owner];
+        var _members = [];
+
         var _messages = [];
+
+        _members.push(owner);
+
 
         var _joinChat = function (user) {
             _members.push(user);
@@ -36,48 +41,56 @@ var ChatService = function (eventbus, events, storage) {
     };
 
 
-    var _addChat = function (owner, chatName) {
+    var _addChat = function (chatData) {
 
-        if (typeof storage.findByPropertyValue(_collectionName, "name", chatName) !== "undefined") {
+        if (typeof storage.findByPropertyValue(_collectionName, "name", chatData.name) !== "undefined") {
 
             var _chatExistMessage = "Chat with specified name is already exist";
             eventbus.post(events.CHAT_NOT_CREATED, new CreationChatEvent(_chatExistMessage));
 
+
         } else {
 
-            var newChat = new Chat(chatName, owner);
+            var newChat = new Chat(chatData.name, chatData.owner);
 
             storage.add(_collectionName, newChat);
 
-            console.log("Chat " + chatName + " was created by " + owner);
+            console.log("Created chat " + chatData.name);
 
-            eventbus.post(events.CHAT_MEMBERS_UPDATED, storage.getAll(_collectionName));
+            eventbus.post(events.CHAT_UPDATED, newChat);
         }
     };
 
-    var _addMember = function(chatName, newMember){
+    var _addMember = function(chatData){
 
-        var chat = storage.findByPropertyValue(_collectionName, "name", chatName);
+        var chat = storage.findByPropertyValue(_collectionName, "name", chatData.name);
 
-        chat.joinChat(newMember);
+        if(typeof chat === "undefined"){
 
-        console.log("User " + newMember + " has joined chat " + chatName);
+            var chatNotFoundMessage = "Chat with specified name does not exist";
+            eventbus.post(events.JOINING_CHAT_FAIL, new CreationChatEvent(chatNotFoundMessage));
+        } else {
+            chat.joinChat(chatData.user);
 
-        eventbus.post(events.CHAT_MEMBERS_UPDATED, storage.getAll(_collectionName));
+            console.log("User " + chatData.user.nickname + " has joined chat " + chatData.name);
+
+            eventbus.post(events.CHAT_UPDATED, chat);
+        }
     };
 
+    var _postMessage = function(chatData){
 
-    var _postMessage = function(author, message, chatName){
+        var chat = storage.findByPropertyValue(_collectionName, "name", chatData.chatName);
 
-        var chat = storage.findByPropertyValue(_collectionName, "name", chatName);
-
-        var newMessage = new Message(author, message);
+        var newMessage = new Message(chatData.author, chatData.message);
 
         chat.postMessage(newMessage);
 
-        console.log("User " + author + " has posted a message to chat " + chatName);
+        console.log("User " + chatData.author.nickname + " has posted a message to chat " + chatData.chatName);
 
-        eventbus.post(events.CHAT_MESSAGES_UPDATED, storage.getAll(_collectionName));
+        var updatedChatData = storage.findByPropertyValue(_collectionName, "name", chatData.chatName);
+
+        eventbus.post(events.CHAT_UPDATED, updatedChatData);
     };
 
 

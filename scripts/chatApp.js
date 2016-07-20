@@ -11,8 +11,11 @@ define(function (require) {
     var UserService = require('./userService');
     var userService = UserService(eventBus, chatEvents, storage);
 
+    var ChatService = require('./chatService');
+    var chatService = ChatService(eventBus, chatEvents, storage);
+
     var ChatRoom = require('./chatRoom');
-    var chatRoom = ChatRoom("chat-app", eventBus, chatEvents, userService);
+    var chatRoom = ChatRoom("chat-app", eventBus, chatEvents, userService, chatService);
 
 
 });

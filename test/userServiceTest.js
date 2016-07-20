@@ -21,9 +21,9 @@ describe('Test user registration', function() {
         var existingUsers;
 
         if(typeof storage.getAll(collectionName) === "undefined"){
-            existingUsers = 0;
+            existingChats = 0;
         } else {
-            existingUsers = storage.getAll(collectionName).length;
+            existingChats = storage.getAll(collectionName).length;
         }
 
 
@@ -48,7 +48,7 @@ describe('Test user registration', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingUsers);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameFirst).nickname).is(nicknameFirst);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameFirst).password).is(passwordFirst);
 
@@ -73,7 +73,7 @@ describe('Test user registration', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingUsers);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameSecond).nickname).is(nicknameSecond);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameSecond).password).is(passwordSecond);
     });
@@ -90,9 +90,9 @@ describe('Test user registration', function() {
         var existingUsers;
 
         if(typeof storage.getAll(collectionName) === "undefined"){
-            existingUsers = 0;
+            existingChats = 0;
         } else {
-            existingUsers = storage.getAll(collectionName).length;
+            existingChats = storage.getAll(collectionName).length;
         }
 
 
@@ -117,7 +117,7 @@ describe('Test user registration', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingUsers);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameFirst).nickname).is(nicknameFirst);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nicknameFirst).password).is(passwordFirst);
 
@@ -140,7 +140,7 @@ describe('Test user registration', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(existingUsers);
+        unitjs.number(storage.getAll(collectionName).length).is(existingChats);
 
     });
 
@@ -155,9 +155,9 @@ describe('Test user registration', function() {
         var existingUsers;
 
         if(typeof storage.getAll(collectionName) === "undefined"){
-            existingUsers = 0;
+            existingChats = 0;
         } else {
-            existingUsers = storage.getAll(collectionName).length;
+            existingChats = storage.getAll(collectionName).length;
         }
 
 
@@ -183,7 +183,7 @@ describe('Test user registration', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(existingUsers);
+        unitjs.number(storage.getAll(collectionName).length).is(existingChats);
     });
 
 });

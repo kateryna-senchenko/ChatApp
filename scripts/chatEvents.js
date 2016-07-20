@@ -6,10 +6,13 @@ var ChatEvents = {
     USERS_UPDATED: "usersUpdated",
     CHAT_IS_CREATED: "chatIsCreated",
     CHAT_NOT_CREATED: "chatCreationFailed",
-    CHAT_MEMBERS_UPDATED: "chatMembersUpdated",
-    CHAT_MESSAGES_UPDATED: "messagesUpdated"
-
-
+    CHAT_UPDATED: "chatUpdated",
+    MESSAGE_IS_POSTED: "messageIsPosted",
+    USER_IS_LOGGED_IN: "userIsLoggedIn",
+    LOGIN_FAILED: "loginFailed",
+    LOGIN_IS_SUCCESSFUL: "loginIsSuccessful",
+    MEMBER_IS_ADDED_TO_CHAT: "memberIsAddedToChat",
+    JOINING_CHAT_FAIL: "joiningChatFail"
 };
 
 if (typeof define !== 'function') {
