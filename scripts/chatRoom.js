@@ -63,6 +63,12 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
             $("#" + messageElementRootId).html($('<p/>').attr("style", "color:green")
                 .text(successfulRegistrationEvent.message));
 
+            var nicknameInputId = registrationBoxId + "_nickname";
+            var passwordInputId = registrationBoxId + "_password";
+            var confirmPasswordInputId = registrationBoxId + "_confirm_password";
+            $("#" + nicknameInputId).val("");
+            $("#" + passwordInputId).val("");
+            $("#" + confirmPasswordInputId).val("");
 
         };
 
