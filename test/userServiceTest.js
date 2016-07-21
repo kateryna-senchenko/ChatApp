@@ -3,20 +3,20 @@ var EventBus = require('../scripts/eventbus');
 var Storage = require('../scripts/storage');
 var unitjs = require('unit.js');
 
-var eb = EventBus();
+var eb = new EventBus();
 var events = require('../scripts/chatEvents');
-var storage = Storage();
-var userService = UserService(eb, events, storage);
+var storage = new Storage();
+var userService = new UserService(eb, events, storage);
 
 
-describe('Test user registration', function() {
+describe('User service should', function() {
 
-    it('Fail to register new users', function() {
+    it('Register new users', function() {
 
         var collectionName = "users";
         var key = "nickname";
 
-        eb.subscribe(events.USER_IS_ADDED, userService.addUser);
+        eb.subscribe(events.ATTEMPT_TO_ADD_USER, userService.addUser);
 
         var existingUsers;
 
@@ -44,7 +44,7 @@ describe('Test user registration', function() {
             newUserConfirmationPassword: passwordFirst
         };
 
-        eb.post(events.USER_IS_ADDED, firstUserData);
+        eb.post(events.ATTEMPT_TO_ADD_USER, firstUserData);
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
@@ -69,7 +69,7 @@ describe('Test user registration', function() {
             newUserConfirmationPassword: passwordSecond
         };
 
-        eb.post(events.USER_IS_ADDED, secondUserData);
+        eb.post(events.ATTEMPT_TO_ADD_USER, secondUserData);
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
@@ -80,12 +80,12 @@ describe('Test user registration', function() {
 
 
 
-    it("Registration with two identical nicknames does not fail", function(){
+    it("Fail to register users with identical nicknames", function(){
 
         var collectionName = "users";
         var key = "nickname";
 
-        eb.subscribe(events.USER_IS_ADDED, userService.addUser);
+        eb.subscribe(events.ATTEMPT_TO_ADD_USER, userService.addUser);
 
         var existingUsers;
 
@@ -113,7 +113,7 @@ describe('Test user registration', function() {
             newUserConfirmationPassword: passwordFirst
         };
 
-        eb.post(events.USER_IS_ADDED, firstUserData);
+        eb.post(events.ATTEMPT_TO_ADD_USER, firstUserData);
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
@@ -124,7 +124,7 @@ describe('Test user registration', function() {
 
         var deliveredSecond = false;
 
-        var messageSecond = "User with specified nickname is already exist";
+        var messageSecond = "Specified nickname is not available";
 
         eb.subscribe(events.REGISTRATION_FAILED, function(e){
             deliveredSecond = (messageSecond === e.message);
@@ -136,7 +136,7 @@ describe('Test user registration', function() {
             newUserConfirmationPassword: passwordFirst
         };
 
-        eb.post(events.USER_IS_ADDED, secondUserData);
+        eb.post(events.ATTEMPT_TO_ADD_USER, secondUserData);
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
@@ -146,11 +146,11 @@ describe('Test user registration', function() {
 
 
 
-    it("Registration with not matching passwords does not fail ", function(){
+    it("Fail to register users if passwords do not match", function(){
 
         var collectionName = "users";
 
-        eb.subscribe(events.USER_IS_ADDED, userService.addUser);
+        eb.subscribe(events.ATTEMPT_TO_ADD_USER, userService.addUser);
 
         var existingUsers;
 
@@ -179,7 +179,7 @@ describe('Test user registration', function() {
             newUserConfirmationPassword: passwordSecond
         };
 
-        eb.post(events.USER_IS_ADDED, firstUserData);
+        eb.post(events.ATTEMPT_TO_ADD_USER, firstUserData);
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();

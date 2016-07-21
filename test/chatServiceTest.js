@@ -3,19 +3,19 @@ var EventBus = require('../scripts/eventbus');
 var Storage = require('../scripts/storage');
 var unitjs = require('unit.js');
 
-var eb = EventBus();
+var eb = new EventBus();
 var events = require('../scripts/chatEvents');
-var storage = Storage();
-var chatService = ChatService(eb, events, storage);
+var storage = new Storage();
+var chatService = new ChatService(eb, events, storage);
 
-describe('Test chat creation', function() {
+describe('Chat service should', function() {
 
-    it('Fail to create new chats', function () {
+    it('Create new chats', function () {
 
         var collectionName = "chats";
         var key = "name";
 
-        eb.subscribe(events.CHAT_IS_CREATED, chatService.addChat);
+        eb.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
 
         var existingChats;
 
@@ -35,7 +35,7 @@ describe('Test chat creation', function() {
         var deliveredFirst = false;
 
 
-        eb.subscribe(events.CHAT_UPDATED, function (e) {
+        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
             deliveredFirst = (nameFirst === e.name);
         });
 
@@ -45,7 +45,7 @@ describe('Test chat creation', function() {
             members: [userAlice]
         };
 
-        eb.post(events.CHAT_IS_CREATED, firstChatData);
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
 
 
         this.timeout(1000);
@@ -58,7 +58,7 @@ describe('Test chat creation', function() {
         var nameSecond = "coffeetime";
         var deliveredSecond = false;
 
-        eb.subscribe(events.CHAT_UPDATED, function (e) {
+        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
             deliveredSecond = (nameSecond === e.name);
         });
 
@@ -68,7 +68,7 @@ describe('Test chat creation', function() {
             members: [userAlice]
         };
 
-        eb.post(events.CHAT_IS_CREATED, secondChatData);
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, secondChatData);
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
@@ -78,12 +78,12 @@ describe('Test chat creation', function() {
     });
 
 
-    it("Creation chats with two identical names does not fail", function () {
+    it("Fail to create chats with identical names", function () {
 
         var collectionName = "chats";
         var key = "name";
 
-        eb.subscribe(events.CHAT_IS_CREATED, chatService.addChat);
+        eb.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
 
         var existingChats;
 
@@ -103,7 +103,7 @@ describe('Test chat creation', function() {
         var deliveredFirst = false;
 
 
-        eb.subscribe(events.CHAT_UPDATED, function (e) {
+        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
             deliveredFirst = (nameFirst === e.name);
         });
 
@@ -113,7 +113,7 @@ describe('Test chat creation', function() {
             members: [userAlice]
         };
 
-        eb.post(events.CHAT_IS_CREATED, firstChatData);
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
@@ -122,14 +122,14 @@ describe('Test chat creation', function() {
 
         var deliveredSecond = false;
 
-        var messageSecond = "Chat with specified name is already exist";
+        var messageSecond = "Specified name is not available";
 
-        eb.subscribe(events.CHAT_NOT_CREATED, function (e) {
+        eb.subscribe(events.CHAT_CREATION_FAILED, function (e) {
             deliveredSecond = (messageSecond === e.message);
         });
 
 
-        eb.post(events.CHAT_IS_CREATED, firstChatData);
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();

@@ -1,21 +1,21 @@
 define(function (require) {
 
     var EventBus = require('./eventbus');
-    var eventBus = EventBus();
+    var eventBus = new EventBus();
 
     var chatEvents = require('./chatEvents');
 
     var Storage = require('./storage');
-    var storage = Storage();
+    var storage = new Storage();
 
     var UserService = require('./userService');
-    var userService = UserService(eventBus, chatEvents, storage);
+    var userService = new UserService(eventBus, chatEvents, storage);
 
     var ChatService = require('./chatService');
-    var chatService = ChatService(eventBus, chatEvents, storage);
+    var chatService = new ChatService(eventBus, chatEvents, storage);
 
     var ChatRoom = require('./chatRoom');
-    var chatRoom = ChatRoom("chat-app", eventBus, chatEvents, userService, chatService);
+    var chatRoom = new ChatRoom("chat-app", eventBus, chatEvents, userService, chatService);
 
 
 });

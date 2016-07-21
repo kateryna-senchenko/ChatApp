@@ -1,0 +1,98 @@
+fieldset{
+    width: 15%;
+    heigth: auto;
+}
+
+fieldset[id$="chat-app_chat_header"]{
+    width: auto;
+    height: auto;
+}
+label{
+    font-family: Calibri;
+    font-size: 20px;
+    color: darkslategrey;
+}
+legend{
+    font-family: Calibri;
+}
+input{
+    display: block;
+    background: lightgray;
+    border: none;
+    font-size: 12px;
+    height: auto;
+    float: left;
+    margin-left: 10px;
+    border-radius: 5px;
+    outline: 0;
+    padding: 10px;
+    width: auto;
+    background-color: #e8eeef;
+    color: darkslategrey;
+}
+
+button{
+    margin-left: 25px;
+}
+
+select{
+   margin-left: 25px;
+    width: 166px;
+    height: 34px;
+    border-radius: 5px;
+    background-color: #e8eeef;
+
+}
+
+.chatBox {
+    color:#333;
+    width:45%;
+    display:inline-block;
+    margin: 10px;
+    border:1px solid #344150;
+    background-color:white;
+    -webkit-box-shadow:1px 1px 5px rgba(0,0,0,.2);
+    -moz-box-shadow:1px 1px 5px rgba(0,0,0,.2);
+    box-shadow:1px 1px 5px rgba(0,0,0,.2);
+    padding:5px;
+}
+
+
+.chatBody {
+    overflow:auto;
+    min-height:200px;
+    width: auto;
+    background: #e8eeef;
+    margin:5px;
+    border-radius: 5px;
+    border:1px solid #344150;
+}
+
+.messageText {
+    display:inline-block;
+    width: 70% !important;
+    margin: 5px !important;
+    height: 50px !important;
+    background: #fafafa !important;
+    border-radius: 5px;
+    border:1px solid #A9A9A9 !important;
+    color: #666 !important;
+    font-weight: 400 !important;
+}
+
+.sendMessage {
+    padding: 5px 4px 4px 5px;
+
+    float: right;
+
+    font-size: 10px;
+    text-align: center;
+    font-style: normal;
+    border-radius: 5px;
+    width: 25%;
+    border-width: 1px 1px 3px;
+    margin: 5px !important;
+    height: 50px !important;
+}
+
+

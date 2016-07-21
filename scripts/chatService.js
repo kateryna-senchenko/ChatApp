@@ -43,10 +43,10 @@ var ChatService = function (eventbus, events, storage) {
 
     var _addChat = function (chatData) {
 
-        if (typeof storage.findByPropertyValue(_collectionName, "name", chatData.name) !== "undefined") {
+        if (storage.findByPropertyValue(_collectionName, "name", chatData.name) !== null) {
 
-            var _chatExistMessage = "Chat with specified name is already exist";
-            eventbus.post(events.CHAT_NOT_CREATED, new CreationChatEvent(_chatExistMessage));
+            var _chatExistMessage = "Specified name is not available";
+            eventbus.post(events.CHAT_CREATION_FAILED, new CreationChatEvent(_chatExistMessage));
 
 
         } else {
@@ -57,26 +57,10 @@ var ChatService = function (eventbus, events, storage) {
 
             console.log("Created chat " + chatData.name);
 
-            eventbus.post(events.CHAT_UPDATED, newChat);
+            eventbus.post(events.CHAT_IS_CREATED, newChat);
         }
     };
 
-    var _addMember = function(chatData){
-
-        var chat = storage.findByPropertyValue(_collectionName, "name", chatData.name);
-
-        if(typeof chat === "undefined"){
-
-            var chatNotFoundMessage = "Chat with specified name does not exist";
-            eventbus.post(events.JOINING_CHAT_FAIL, new CreationChatEvent(chatNotFoundMessage));
-        } else {
-            chat.joinChat(chatData.user);
-
-            console.log("User " + chatData.user.nickname + " has joined chat " + chatData.name);
-
-            eventbus.post(events.CHAT_UPDATED, chat);
-        }
-    };
 
     var _postMessage = function(chatData){
 
@@ -86,7 +70,7 @@ var ChatService = function (eventbus, events, storage) {
 
         chat.postMessage(newMessage);
 
-        console.log("User " + chatData.author.nickname + " has posted a message to chat " + chatData.chatName);
+        console.log("User " + chatData.author + " has posted a message to chat " + chatData.chatName);
 
         var updatedChatData = storage.findByPropertyValue(_collectionName, "name", chatData.chatName);
 
@@ -94,10 +78,15 @@ var ChatService = function (eventbus, events, storage) {
     };
 
 
+    var _getAllChats = function(){
+
+        return storage.getAll(_collectionName);
+    };
+
     return {
         "addChat": _addChat,
-        "addMember": _addMember,
-        "postMessage": _postMessage
+        "postMessage": _postMessage,
+        "getAllChats": _getAllChats
     };
 };
 

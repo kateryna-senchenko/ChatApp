@@ -13,10 +13,10 @@ var Storage = function () {
         var collection = _getCollectionByName(collection);
 
         if (typeof collection === "undefined") {
-            return;
+            return null;
         }
 
-        var item;
+        var item = null;
         for (var i = 0; i < collection.length; i++) {
 
             if (collection[i][id] === idValue) {
