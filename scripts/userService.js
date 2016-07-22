@@ -41,8 +41,8 @@ var UserService = function (eventbus, events, storage) {
 
         } else if (userData.newUserPassword !== userData.newUserConfirmationPassword) {
 
-            var _passwordsDoNOtMatchMessage = "Passwords do not match";
-            eventbus.post(events.REGISTRATION_FAILED, new UserServiceEventTemplate(_passwordsDoNOtMatchMessage));
+            var _passwordsDoNotMatchMessage = "Passwords do not match";
+            eventbus.post(events.REGISTRATION_FAILED, new UserServiceEventTemplate(_passwordsDoNotMatchMessage));
 
         } else {
 

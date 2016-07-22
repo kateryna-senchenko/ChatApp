@@ -198,7 +198,6 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                 var existingChats = chatService.getAllChats();
 
                 if (typeof existingChats !== "undefined") {
-                    console.log("there are " + existingChats.length + " chats");
 
                     for (var i = 0; i < existingChats; i++) {
                         $("#" + selectChatId).append($('<option/>').text(existingChats[i].name));
@@ -266,9 +265,11 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                 var messagesId = chatBoxId + "_messages";
                 var messageInputId = chatBoxId + "_newMessage";
                 var sendButtonId = chatBoxId + "_send";
+                var leaveButtonId = chatBoxId + "_leave";
 
                 $("#" + chatRoomDivId).append($('<div/>').attr({"id": chatBoxId, "class": "chatBox"}));
                 $("#" + chatBoxId).append($('<label/>')).text(chatData.name)
+                    .append($('<button/>').attr({"class": "leaveChat", "id": leaveButtonId}).text("Close"))
                     .append($('<div/>'))
                     .append($('<fieldset/>').attr({"id": messagesId, 'class': 'chatBody'}))
                     .append($('<input/>').attr({
@@ -280,7 +281,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                     .append($('<button/>').attr({'id': sendButtonId, 'class': 'sendMessage'}).text('Send'));
 
 
-                var messages = chatData.messages;
+                var messages = chatService.getChatByName(chatData.name).messages;
 
                 if (typeof messages !== "undefined") {
 
@@ -303,6 +304,10 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                     eventbus.post(events.ATTEMPT_TO_POST_MESSAGE, updatedChatData);
                 });
 
+
+                $("#" + leaveButtonId).click(function(){
+                    $("#" + chatBoxId).remove();
+                });
 
             };
 
@@ -352,7 +357,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
         eventbus.subscribe(events.CHAT_UPDATED, chatComponent.updateMessages);
         eventbus.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
         eventbus.subscribe(events.ATTEMPT_TO_POST_MESSAGE, chatService.postMessage);
-        eventbus.subscribe(events.ATTEMPT_TO_ADD_MEMBER, chatService.addMember);
+        //eventbus.subscribe(events.ATTEMPT_TO_ADD_MEMBER, chatService.addMember);
         eventbus.subscribe(events.JOINING_CHAT_FAIL, chatComponent.showErrorMessage);
 
     }

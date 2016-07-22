@@ -80,17 +80,18 @@ select{
     font-weight: 400 !important;
 }
 
+.leaveChat{
+    float: right;
+}
+
 .sendMessage {
     padding: 5px 4px 4px 5px;
-
     float: right;
-
     font-size: 10px;
     text-align: center;
     font-style: normal;
     border-radius: 5px;
     width: 25%;
-    border-width: 1px 1px 3px;
     margin: 5px !important;
     height: 50px !important;
 }

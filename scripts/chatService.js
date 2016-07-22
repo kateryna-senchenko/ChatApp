@@ -84,6 +84,10 @@ var ChatService = function (eventbus, events, storage) {
         eventbus.post(events.CHAT_UPDATED, updatedChatData);
     };
 
+    var _getChatByName = function(name){
+
+        return storage.findByPropertyValue(_collectionName, "name", name);
+    };
 
     var _getAllChats = function(){
 
@@ -93,6 +97,7 @@ var ChatService = function (eventbus, events, storage) {
     return {
         "addChat": _addChat,
         "postMessage": _postMessage,
+        "getChatByName": _getChatByName,
         "getAllChats": _getAllChats
     };
 };
