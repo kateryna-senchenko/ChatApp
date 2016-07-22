@@ -200,7 +200,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                 if (typeof existingChats !== "undefined") {
 
                     for (var i = 0; i < existingChats; i++) {
-                        $("#" + selectChatId).append($('<option/>').text(existingChats[i].name));
+                        $("#" + selectChatId).append($('<option/>').attr("value", existingChats[i].name).text(existingChats[i].name));
                     }
                 }
 
@@ -223,11 +223,12 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
                     var chatData = {
 
-                        "name": $("#" + selectChatId).val(),
+                        "chat": chatService.getChatByName($("#" + selectChatId).val()),
                         "user": userLoggedInEvent.user.nickname
                     };
 
-                    console.log("User " + userLoggedInEvent.user.nickname + " is trying to join chat " + chatData.name);
+
+                    console.log("User " + userLoggedInEvent.user.nickname + " is trying to join chat " + chatData.chat.name);
 
                     _showChat(chatData);
 
@@ -261,54 +262,60 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
             var _showChat = function (chatData) {
 
-                var chatBoxId = chatRoomDivId + "_" + chatData.name;
-                var messagesId = chatBoxId + "_messages";
-                var messageInputId = chatBoxId + "_newMessage";
-                var sendButtonId = chatBoxId + "_send";
-                var leaveButtonId = chatBoxId + "_leave";
+                if (!chatData.chat.active) {
 
-                $("#" + chatRoomDivId).append($('<div/>').attr({"id": chatBoxId, "class": "chatBox"}));
-                $("#" + chatBoxId).append($('<label/>')).text(chatData.name)
-                    .append($('<button/>').attr({"class": "leaveChat", "id": leaveButtonId}).text("Close"))
-                    .append($('<div/>'))
-                    .append($('<fieldset/>').attr({"id": messagesId, 'class': 'chatBody'}))
-                    .append($('<input/>').attr({
-                        'id': messageInputId,
-                        'class': 'messageText',
-                        'type': 'text',
-                        'placeholder': 'Type here'
-                    }))
-                    .append($('<button/>').attr({'id': sendButtonId, 'class': 'sendMessage'}).text('Send'));
+                    chatData.chat.active = true;
+
+                    var chatBoxId = chatRoomDivId + "_" + chatData.chat.name;
+                    var messagesId = chatBoxId + "_messages";
+                    var messageInputId = chatBoxId + "_newMessage";
+                    var sendButtonId = chatBoxId + "_send";
+                    var leaveButtonId = chatBoxId + "_leave";
 
 
-                var messages = chatService.getChatByName(chatData.name).messages;
+                    $("#" + chatRoomDivId).append($('<div/>').attr({"id": chatBoxId, "class": "chatBox"}));
+                    $("#" + chatBoxId).append($('<label/>')).text(chatData.chat.name)
+                        .append($('<button/>').attr({"class": "leaveChat", "id": leaveButtonId}).text("Close"))
+                        .append($('<div/>'))
+                        .append($('<fieldset/>').attr({"id": messagesId, 'class': 'chatBody'}))
+                        .append($('<input/>').attr({
+                            'id': messageInputId,
+                            'class': 'messageText',
+                            'type': 'text',
+                            'placeholder': 'Type here'
+                        }))
+                        .append($('<button/>').attr({'id': sendButtonId, 'class': 'sendMessage'}).text('Send'));
 
-                if (typeof messages !== "undefined") {
 
-                    for (var i = 0; i < messages.length; i++) {
-                        $("#" + messagesId).append($('<li/>').text(messages[i].author + ": " + messages[i].message));
+                    var messages = chatData.chat.messages;
+
+                    if (typeof messages !== "undefined") {
+
+                        for (var i = 0; i < messages.length; i++) {
+                            $("#" + messagesId).append($('<li/>').text(messages[i].author + ": " + messages[i].message));
+                        }
                     }
+
+
+                    $("#" + sendButtonId).click(function () {
+
+                        var updatedChatData = {
+                            "chatName": chatData.chat.name,
+                            "author": chatData.user,
+                            "message": $("#" + messageInputId).val()
+                        };
+
+                        console.log("Posting message by " + updatedChatData.author);
+
+                        eventbus.post(events.ATTEMPT_TO_POST_MESSAGE, updatedChatData);
+                    });
+
+
+                    $("#" + leaveButtonId).click(function () {
+                        chatData.chat.active = false;
+                        $("#" + chatBoxId).remove();
+                    });
                 }
-
-
-                $("#" + sendButtonId).click(function () {
-
-                    var updatedChatData = {
-                        "chatName": chatData.name,
-                        "author": chatData.user,
-                        "message": $("#" + messageInputId).val()
-                    };
-
-                    console.log("Posting message by " + updatedChatData.author);
-
-                    eventbus.post(events.ATTEMPT_TO_POST_MESSAGE, updatedChatData);
-                });
-
-
-                $("#" + leaveButtonId).click(function(){
-                    $("#" + chatBoxId).remove();
-                });
-
             };
 
             var _updateMessages = function (chatData) {

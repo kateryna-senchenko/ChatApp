@@ -5,6 +5,8 @@ var ChatService = function (eventbus, events, storage) {
 
     var Chat = function (name, owner) {
 
+        var _active = false;
+
         var _members = [];
 
         var _messages = [];
@@ -25,7 +27,8 @@ var ChatService = function (eventbus, events, storage) {
             "members": _members,
             "messages": _messages,
             "joinChat": _joinChat,
-            "postMessage": _postMessage
+            "postMessage": _postMessage,
+            "active": _active
         }
     };
 
