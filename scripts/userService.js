@@ -22,6 +22,8 @@ var UserService = function (eventbus, events, storage) {
 
     var _registerUser = function (userData) {
 
+        userData.newNickname = userData.newNickname.trim();
+
         if ((userData.newNickname.indexOf(" ") >= 0) || (userData.newNickname.length === 0)) {
 
             var _invalidInputMessage = "Nickname should not be empty or contain white spaces";

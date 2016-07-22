@@ -43,7 +43,14 @@ var ChatService = function (eventbus, events, storage) {
 
     var _addChat = function (chatData) {
 
-        if (storage.findByPropertyValue(_collectionName, "name", chatData.name) !== null) {
+        chatData.name = chatData.name.trim();
+
+        if(chatData.name.length === 0){
+
+            var _invalidInputMessage = "Chat name should not be empty";
+            eventbus.post(events.CHAT_CREATION_FAILED, new CreationChatEvent(_invalidInputMessage));
+
+        } else if (storage.findByPropertyValue(_collectionName, "name", chatData.name) !== null) {
 
             var _chatExistMessage = "Specified name is not available";
             eventbus.post(events.CHAT_CREATION_FAILED, new CreationChatEvent(_chatExistMessage));

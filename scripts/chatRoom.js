@@ -178,7 +178,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                 var createChatButtonId = chatComponentId + "_createChatButton";
                 var selectChatId = chatComponentId + "_selectChat";
                 var joinChatButtonId = chatComponentId + "_joinChatButton";
-                var createChatErrorId = chatComponentId + "_createChatError"
+                var createChatErrorId = chatComponentId + "_createChatError";
 
                 $("#" + chatComponentId).append($('<fieldset/>').attr("id", chatHeaderId));
                 $('<label/>').text(userLoggedInEvent.message).appendTo($('fieldset'));
@@ -240,13 +240,14 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
                 var chatNameInputId = chatComponentId + "_chatName";
                 var selectChatId = chatComponentId + "_selectChat";
+                var createChatErrorId = chatComponentId + "_createChatError";
 
                 $("#" + chatNameInputId).val("");
+                $("#" + createChatErrorId).text("");
 
                 var existingChats = chatService.getAllChats();
                 $("#" + selectChatId).find("option").remove();
 
-                console.log("there are " + existingChats.length + " chats");
 
                 for (var i = 0; i < existingChats.length; i++) {
                     $("#" + selectChatId).append($('<option/>').text(existingChats[i].name));
@@ -255,7 +256,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
             };
             var _showErrorMessage = function (errorEvent) {
 
-                $("#" + chatRoomDivId + "_chat_errorMessage").attr("style", "color:red; font-size:14; font-family:'Calibri'")
+                $("#" + chatComponentId + "_createChatError").attr("style", "color:red; font-size:14; font-family:'Calibri'")
                     .text(errorEvent.message);
             };
 
@@ -277,7 +278,6 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
                         'placeholder': 'Type here'
                     }))
                     .append($('<button/>').attr({'id': sendButtonId, 'class': 'sendMessage'}).text('Send'));
-
 
 
                 var messages = chatData.messages;
@@ -306,7 +306,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
             };
 
-            var _updateMessages = function(chatData){
+            var _updateMessages = function (chatData) {
 
                 var messagesId = chatRoomDivId + "_" + chatData.name + "_messages";
                 var messages = chatData.messages;
@@ -348,6 +348,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
         eventbus.subscribe(events.LOGIN_IS_SUCCESSFUL, loginComponent.closeLoginForm);
         eventbus.subscribe(events.LOGIN_IS_SUCCESSFUL, chatComponent.init);
         eventbus.subscribe(events.CHAT_IS_CREATED, chatComponent.updateAvailableChats);
+        eventbus.subscribe(events.CHAT_CREATION_FAILED, chatComponent.showErrorMessage);
         eventbus.subscribe(events.CHAT_UPDATED, chatComponent.updateMessages);
         eventbus.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
         eventbus.subscribe(events.ATTEMPT_TO_POST_MESSAGE, chatService.postMessage);
