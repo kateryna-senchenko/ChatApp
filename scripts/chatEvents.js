@@ -18,7 +18,6 @@ var ChatEvents = {
 
     ATTEMPT_TO_ADD_MEMBER: 'attemptToAddMember',
     MEMBER_IS_ADDED: 'memberIsAdded',
-    JOINING_CHAT_FAIL: 'joiningChatFail',
     ATTEMPT_TO_LEAVE_CHAT: 'attemptToLeaveChat'
 };
 

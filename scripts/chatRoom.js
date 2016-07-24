@@ -354,7 +354,6 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
     eventbus.subscribe(events.ATTEMPT_TO_ADD_MEMBER, chatService.addMember);
     eventbus.subscribe(events.MEMBER_IS_ADDED, chatComponent.showChat);
     eventbus.subscribe(events.ATTEMPT_TO_LEAVE_CHAT, chatService.removeMember);
-    eventbus.subscribe(events.JOINING_CHAT_FAIL, chatComponent.showErrorMessage);
 
 };
 

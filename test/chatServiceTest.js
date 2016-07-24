@@ -61,7 +61,7 @@ describe('Chat service should', function () {
         unitjs.string(storage.findByPropertyValue(collectionName, key, nameFirst).name).is(nameFirst);
 
 
-        var nameSecond = "coffeetime";
+        var nameSecond = "coffee time";
         var deliveredSecond = false;
 
         eb.subscribe(events.CHAT_IS_CREATED, function (updatedChats) {
@@ -103,7 +103,7 @@ describe('Chat service should', function () {
         }
 
 
-        var nameFirst = "followthewhiterabbit";
+        var nameFirst = "follow the white rabbit";
 
         var userAlice = {
             "nickname": "Alice",
@@ -236,7 +236,7 @@ describe('Chat service should', function () {
         var _collectionName = "chats";
         var key = "name";
 
-        var nameFirst = "ProtectTheMockinbirds";
+        var nameFirst = "Protect The Mockingbirds";
         var firstChatData = {
             name: nameFirst
         };
@@ -278,12 +278,49 @@ describe('Chat service should', function () {
 
     });
 
+    it("Fail to add member if he/she is already in the chat", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "Pilgrims to Vegas";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var userNickname = "Boo91";
+        var secondChatData = {
+            chatName: chat.name,
+            user: userNickname
+        };
+
+        eb.post(events.ATTEMPT_TO_ADD_MEMBER, secondChatData);
+
+        var existingMembersCount;
+
+        if (typeof chat.members === "undefined") {
+            existingMembersCount = 0;
+        } else {
+            existingMembersCount = chat.members.length;
+        }
+
+        eb.post(events.ATTEMPT_TO_ADD_MEMBER, secondChatData);
+
+        this.timeout(1000);
+        unitjs.number(chat.members.length).is(existingMembersCount);
+
+    });
+
     it("Remove member from chat", function () {
 
         var _collectionName = "chats";
         var key = "name";
 
-        var nameFirst = "FreeParrots";
+        var nameFirst = "Free Parrots";
         var firstChatData = {
             name: nameFirst
         };
@@ -340,12 +377,49 @@ describe('Chat service should', function () {
 
     });
 
+    it("Fail to remove member if there is no such member in the chat", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "Water for Elephants";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var userNickname = "Jacob";
+        var secondChatData = {
+            chat: chat,
+            user: userNickname
+        };
+
+
+        var existingMembersCount;
+
+        if (typeof chat.members === "undefined") {
+            existingMembersCount = 0;
+        } else {
+            existingMembersCount = chat.members.length;
+        }
+
+        eb.post(events.ATTEMPT_TO_LEAVE_CHAT, secondChatData);
+
+
+        this.timeout(1000);
+        unitjs.number(chat.members.length).is(existingMembersCount);
+
+    });
+
     it("Post message to chat", function () {
 
         var _collectionName = "chats";
         var key = "name";
 
-        var nameFirst = "TheRed-HeadedLeague";
+        var nameFirst = "The Red-Headed League";
         var firstChatData = {
             name: nameFirst
         };
@@ -390,8 +464,50 @@ describe('Chat service should', function () {
         }
 
         this.timeout(1000);
-        unitjs.number(chat.members.length).is(++existingMessagesCount);
+        unitjs.number(chat.messages.length).is(++existingMessagesCount);
         unitjs.bool(messageAdded).isTrue();
+
+
+    });
+
+    it("Fail to post message by nonmember", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "Ghost Hunters";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var userNickname = "Casper";
+
+        var message = "Hello there!";
+
+        var existingMessagesCount;
+
+        if (typeof chat.messages === "undefined") {
+            existingMessagesCount = 0;
+        } else {
+            existingMessagesCount = chat.messages.length;
+        }
+
+        var secondData = {
+            chatName: chat.name,
+            author: userNickname,
+            message: message
+        };
+
+
+        eb.post(events.ATTEMPT_TO_POST_MESSAGE, secondData);
+
+
+        this.timeout(1000);
+        unitjs.number(chat.messages.length).is(existingMessagesCount);
 
 
     });
