@@ -252,7 +252,7 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
         var _showChat = function (chatData) {
 
-            var chatBoxId = chatRoomDivId + '_' + chatData.chat.name;
+            var chatBoxId = chatRoomDivId + '_' + chatData.chat.id;
             var messagesId = chatBoxId + '_messages';
             var messageInputId = chatBoxId + '_newMessage';
             var sendButtonId = chatBoxId + '_send';
@@ -307,9 +307,9 @@ var ChatRoom = function (chatRoomDivId, eventbus, events, userService, chatServi
 
         var _updateMessages = function (chatData) {
 
-            var messagesId = chatRoomDivId + '_' + chatData.name + '_messages';
+            var messagesId = chatRoomDivId + '_' + chatData.id + '_messages';
             var messages = chatData.messages;
-            var messageInputId = chatRoomDivId + '_' + chatData.name + '_newMessage';
+            var messageInputId = chatRoomDivId + '_' + chatData.id + '_newMessage';
 
             $('#' + messagesId).find($('li')).remove();
             $('#' + messageInputId).val('');

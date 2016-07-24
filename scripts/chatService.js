@@ -3,7 +3,7 @@ var ChatService = function (eventbus, events, storage) {
     var _collectionName = "chats";
 
 
-    var Chat = function (name) {
+    var Chat = function (id, name) {
 
         var _members = [];
 
@@ -22,6 +22,7 @@ var ChatService = function (eventbus, events, storage) {
         };
 
         return {
+            "id": id,
             "name": name,
             "members": _members,
             "messages": _messages,
@@ -62,7 +63,7 @@ var ChatService = function (eventbus, events, storage) {
 
         } else {
 
-            var newChat = new Chat(chatData.name);
+            var newChat = new Chat(Date.now(), chatData.name);
 
             storage.add(_collectionName, newChat);
 
