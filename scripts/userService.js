@@ -18,8 +18,6 @@ var UserService = function (eventbus, events, storage) {
         }
     };
 
-    var sessions = [];
-
     var _registerUser = function (userData) {
 
         userData.newNickname = userData.newNickname.trim();
@@ -55,7 +53,7 @@ var UserService = function (eventbus, events, storage) {
             var _userAddedMessage = "User " + userData.newNickname + " is successfully registered";
 
             eventbus.post(events.REGISTRATION_IS_SUCCESSFUL, new UserServiceEventTemplate(_userAddedMessage));
-            eventbus.post(events.USERS_UPDATED, storage.getAll(_collectionName));
+
         }
     };
 
@@ -70,7 +68,7 @@ var UserService = function (eventbus, events, storage) {
 
         } else {
 
-            sessions.push(user);
+            storage.add("sessions", user);
             console.log("User " + userData.nickname + " is logged in");
 
             var _userLoggedInMessage = "Welcome " + userData.nickname;
@@ -81,7 +79,7 @@ var UserService = function (eventbus, events, storage) {
 
     };
 
-    _getAllUsers = function () {
+    var _getAllUsers = function () {
 
         return storage.getAll(_collectionName);
     };
@@ -90,6 +88,7 @@ var UserService = function (eventbus, events, storage) {
         "addUser": _registerUser,
         "loginUser": _loginUser,
         "getAllUsers": _getAllUsers
+
     };
 };
 
