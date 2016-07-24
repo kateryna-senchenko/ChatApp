@@ -2,27 +2,29 @@ var ChatService = require('../scripts/chatService');
 var EventBus = require('../scripts/eventbus');
 var Storage = require('../scripts/storage');
 var unitjs = require('unit.js');
-
 var eb = new EventBus();
 var events = require('../scripts/chatEvents');
 var storage = new Storage();
 var chatService = new ChatService(eb, events, storage);
 
-describe('Chat service should', function() {
+describe('Chat service should', function () {
+
+    eb.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
+    eb.subscribe(events.ATTEMPT_TO_ADD_MEMBER, chatService.addMember);
+    eb.subscribe(events.ATTEMPT_TO_LEAVE_CHAT, chatService.removeMember);
+    eb.subscribe(events.ATTEMPT_TO_POST_MESSAGE, chatService.postMessage);
 
     it('Create new chats', function () {
 
         var collectionName = "chats";
         var key = "name";
 
-        eb.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
-
-        var existingChats;
+        var existingChatsCount;
 
         if (typeof storage.getAll(collectionName) === "undefined") {
-            existingChats = 0;
+            existingChatsCount = 0;
         } else {
-            existingChats = storage.getAll(collectionName).length;
+            existingChatsCount = storage.getAll(collectionName).length;
         }
 
 
@@ -35,8 +37,13 @@ describe('Chat service should', function() {
         var deliveredFirst = false;
 
 
-        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
-            deliveredFirst = (nameFirst === e.name);
+        eb.subscribe(events.CHAT_IS_CREATED, function (updatedChats) {
+            for (var i = 0; i < updatedChats.length; i++) {
+                if (updatedChats[i].name === nameFirst) {
+                    deliveredFirst = true;
+                    break;
+                }
+            }
         });
 
 
@@ -50,16 +57,20 @@ describe('Chat service should', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChatsCount);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nameFirst).name).is(nameFirst);
-
 
 
         var nameSecond = "coffeetime";
         var deliveredSecond = false;
 
-        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
-            deliveredSecond = (nameSecond === e.name);
+        eb.subscribe(events.CHAT_IS_CREATED, function (updatedChats) {
+            for (var i = 0; i < updatedChats.length; i++) {
+                if (updatedChats[i].name === nameSecond) {
+                    deliveredSecond = true;
+                    break;
+                }
+            }
         });
 
 
@@ -72,7 +83,7 @@ describe('Chat service should', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChatsCount);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nameSecond).name).is(nameSecond);
 
     });
@@ -83,14 +94,12 @@ describe('Chat service should', function() {
         var collectionName = "chats";
         var key = "name";
 
-        eb.subscribe(events.ATTEMPT_TO_CREATE_CHAT, chatService.addChat);
-
-        var existingChats;
+        var existingChatsCount;
 
         if (typeof storage.getAll(collectionName) === "undefined") {
-            existingChats = 0;
+            existingChatsCount = 0;
         } else {
-            existingChats = storage.getAll(collectionName).length;
+            existingChatsCount = storage.getAll(collectionName).length;
         }
 
 
@@ -103,8 +112,13 @@ describe('Chat service should', function() {
         var deliveredFirst = false;
 
 
-        eb.subscribe(events.CHAT_IS_CREATED, function (e) {
-            deliveredFirst = (nameFirst === e.name);
+        eb.subscribe(events.CHAT_IS_CREATED, function (updatedChats) {
+            for (var i = 0; i < updatedChats.length; i++) {
+                if (updatedChats[i].name === nameFirst) {
+                    deliveredFirst = true;
+                    break;
+                }
+            }
         });
 
 
@@ -117,7 +131,7 @@ describe('Chat service should', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredFirst).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(++existingChats);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChatsCount);
         unitjs.string(storage.findByPropertyValue(collectionName, key, nameFirst).name).is(nameFirst);
 
         var deliveredSecond = false;
@@ -133,7 +147,254 @@ describe('Chat service should', function() {
 
         this.timeout(1000);
         unitjs.bool(deliveredSecond).isTrue();
-        unitjs.number(storage.getAll(collectionName).length).is(existingChats);
+        unitjs.number(storage.getAll(collectionName).length).is(existingChatsCount);
 
     });
+
+
+    it("Trim chat name", function () {
+
+        var collectionName = "chats";
+        var key = "name";
+
+        var existingChatsCount;
+
+        if (typeof storage.getAll(collectionName) === "undefined") {
+            existingChatsCount = 0;
+        } else {
+            existingChatsCount = storage.getAll(collectionName).length;
+        }
+
+        var nameFirst = "Boo";
+
+
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        this.timeout(1000);
+        unitjs.number(storage.getAll(collectionName).length).is(++existingChatsCount);
+        unitjs.string(storage.findByPropertyValue(collectionName, key, nameFirst).name).is(nameFirst);
+
+        var deliveredFirst = false;
+        var messageFirst = "Specified name is not available";
+
+        var nameSecond = " Boo  ";
+        var secondChatData = {
+            name: nameSecond
+        };
+
+
+        eb.subscribe(events.CHAT_CREATION_FAILED, function (e) {
+            deliveredFirst = (messageFirst === e.message);
+        });
+
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, secondChatData);
+
+        this.timeout(1000);
+        unitjs.bool(deliveredFirst).isTrue();
+        unitjs.number(storage.getAll(collectionName).length).is(existingChatsCount);
+
+    });
+
+    it("Fail to create chat if chat name is empty", function () {
+
+        var collectionName = "chats";
+
+        var existingChatsCount;
+
+        if (typeof storage.getAll(collectionName) === "undefined") {
+            existingChatsCount = 0;
+        } else {
+            existingChatsCount = storage.getAll(collectionName).length;
+        }
+
+        var nameFirst = "";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        var deliveredFirst = false;
+        var messageFirst = "Chat name should not be empty";
+
+        eb.subscribe(events.CHAT_CREATION_FAILED, function (e) {
+            deliveredFirst = (messageFirst === e.message);
+        });
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        this.timeout(1000);
+        unitjs.bool(deliveredFirst).isTrue();
+        unitjs.number(storage.getAll(collectionName).length).is(existingChatsCount);
+    });
+
+    it("Add member to chat", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "ProtectTheMockinbirds";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var existingMembersCount;
+
+        if (typeof chat.members === "undefined") {
+            existingMembersCount = 0;
+        } else {
+            existingMembersCount = chat.members.length;
+        }
+
+        var userNickname = "Scout";
+        var secondChatData = {
+            chatName: chat.name,
+            user: userNickname
+        };
+
+        var userAdded = false;
+
+        eb.post(events.ATTEMPT_TO_ADD_MEMBER, secondChatData);
+
+        for (var i = 0; i < chat.members.length; i++) {
+            if (chat.members[i] === userNickname) {
+                userAdded = true;
+                break;
+            }
+        }
+
+
+        this.timeout(1000);
+        unitjs.number(chat.members.length).is(++existingMembersCount);
+        unitjs.bool(userAdded).isTrue();
+
+
+    });
+
+    it("Remove member from chat", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "FreeParrots";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var userNickname = "Jem";
+        var secondChatData = {
+            chatName: chat.name,
+            user: userNickname
+        };
+
+        eb.post(events.ATTEMPT_TO_ADD_MEMBER, secondChatData);
+
+        var existingMembersCount;
+
+        if (typeof chat.members === "undefined") {
+            existingMembersCount = 0;
+        } else {
+            existingMembersCount = chat.members.length;
+        }
+
+        var userRemoved = false;
+
+        var thirdChatData = {
+            chat: chat,
+            user: userNickname
+        };
+
+        eb.post(events.ATTEMPT_TO_LEAVE_CHAT, thirdChatData);
+
+        var members = storage.findByPropertyValue(_collectionName, "name", nameFirst).members;
+
+        if (members.length === 0) {
+            userRemoved = true;
+        } else {
+            for (var i = 0; i < members.length; i++) {
+                if (members[i] === userNickname) {
+                    userRemoved = false;
+                    break;
+                } else {
+                    userRemoved = true;
+                }
+            }
+        }
+
+
+        this.timeout(1000);
+        unitjs.number(chat.members.length).is(--existingMembersCount);
+        unitjs.bool(userRemoved).isTrue();
+
+
+    });
+
+    it("Post message to chat", function () {
+
+        var _collectionName = "chats";
+        var key = "name";
+
+        var nameFirst = "TheRed-HeadedLeague";
+        var firstChatData = {
+            name: nameFirst
+        };
+
+        eb.post(events.ATTEMPT_TO_CREATE_CHAT, firstChatData);
+
+        var chat = storage.findByPropertyValue(_collectionName, "name", nameFirst);
+
+        var userNickname = "Mr.Fox";
+        var secondChatData = {
+            chatName: chat.name,
+            user: userNickname
+        };
+
+        eb.post(events.ATTEMPT_TO_ADD_MEMBER, secondChatData);
+
+        var message = "Hello there!";
+
+        var existingMessagesCount;
+
+        if (typeof chat.messages === "undefined") {
+            existingMessagesCount = 0;
+        } else {
+            existingMessagesCount = chat.messages.length;
+        }
+
+        var thirdData = {
+            chatName: chat.name,
+            author: userNickname,
+            message: message
+        };
+
+        var messageAdded = false;
+
+        eb.post(events.ATTEMPT_TO_POST_MESSAGE, thirdData);
+
+        for (var i = 0; i < chat.messages.length; i++) {
+            if ((chat.messages[i].message === message) && (chat.messages[i].author === userNickname)) {
+                messageAdded = true;
+                break;
+            }
+        }
+
+        this.timeout(1000);
+        unitjs.number(chat.members.length).is(++existingMessagesCount);
+        unitjs.bool(messageAdded).isTrue();
+
+
+    });
+
+
 });
